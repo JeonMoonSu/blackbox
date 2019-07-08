@@ -41,13 +41,25 @@ int main(void)
 	shmaddr = (int*)shared_Mem;
 
 	// step3. memory access
+	
+	//I'm ready, start sending[t]
 	shmaddr[0] = 't';
 	
+	//File End[e]
 	while(shmaddr[0] != 'e')
 	{
+		//File sended[s]
 		if(shmaddr[0] == 's')
 		{
-			fwrite(shmaddr+1,SHMSIZE-1,1,fp);
+			int size = fwrite(shmaddr+1,1,SHMSIZE-1,fp);
+			//Finish attached[a]
+			shmaddr[0] = 'a';
+		}
+		//Last Message[l]
+		if(shmaddr[0] == 'l')
+		{
+			int size = fwrite(shmaddr+2,1,shmaddr[1],fp);
+			printf("last sended size = %d\n",size);
 			shmaddr[0] = 'a';
 		}
 	}

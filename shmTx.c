@@ -46,32 +46,46 @@ int main(void)
 	shmaddr = (int*)shared_Mem;
 
 	// step3. memory access
+
+	// Wait until Receive Process is ready
 	while(1)
 	{
+		//start[t]
 		if(shmaddr[0] == 't')
 		{
 			break;
 		}
 	}
 	printf("start!!");
-	fseek(fp,0,SEEK_SET);
 
+	fseek(fp,0,SEEK_SET);
 	while(!feof(fp))
 	{
+		//start[t] or receive attached[a] message
 		if(shmaddr[0] == 'a' || shmaddr[0] == 't')
 		{
-			fread(shmaddr+1,SHMSIZE-1,1,fp);
-			shmaddr[0] = 's';
+			int size = fread(shmaddr+1,1,SHMSIZE-1,fp);
+			//Last send[l]
+			if(size < SHMSIZE-1)
+			{
+				shmaddr[0] = 'l';
+				shmaddr[1] = size;
+			}
+			else
+				//complete data send[s]
+				shmaddr[0] = 's';
 		}
 	}
+	//상대방이 마지막 데이터 받을때까지[a] 대기
 	while(1)
 	{
 		if(shmaddr[0] == 'a')
 			break;
 	}
+	//종료선언[e]
 	shmaddr[0] = 'e';
-	printf("succeed file trasfer");
-	//sleep(4);
+
+	printf("succeed file trasfer\n");
 
 	// step4. shmdt
 	if (shmdt(shared_Mem) == -1)

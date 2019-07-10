@@ -132,6 +132,8 @@ int main(int argc, char* argv[])
 
 	VideoWriter video;
 	
+	system("mkdir ./user");
+	system("mkdir ./user/blackbox");
 	while(1)
 	{
 		cap >> img_color;

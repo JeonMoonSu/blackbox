@@ -142,7 +142,6 @@ int main(int argc, char* argv[])
 		if(first)
 		{
 			s_time = the_time;
-			getdirtime(the_time,d_buffer);
 			folderName = d_buffer;
 			string str = "mkdir ./user/blackbox/"+folderName;
 			const char* command = str.c_str();

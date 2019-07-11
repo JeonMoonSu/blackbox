@@ -1,5 +1,6 @@
 #pragma once
 #include <time.h>
+#include <signal.h>
 #include <unistd.h>
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -58,15 +59,25 @@ void remove_dir()
 int check_disk()
 {
         char path[BUFSIZ + 1] = "du -s ./user/blackbox/";
+	char size[BUFSIZ + 1] = "df -k";
         char *sArr[BUFSIZ + 1] = { NULL , };
+	char *sArr2[BUFSIZ + 1] = { NULL , };
         int i = 0;
         int byte = 0;
+	int a_size = 0;
 
         char buffer[BUFSIZ +1];
         strcpy(buffer, command_call(path));
+	
+	char buffer2[BUFSIZ + 1];
+	strcpy(buffer2, command_call(size));
 
         char* ptr = strtok(buffer, "\0");
-
+	char* ptr2 = strtok(buffer2, "\n");
+	for(int j = 0 ; j < 4 ; ++ j)
+	{
+		ptr2 = strtok(NULL," ");
+	}
         while(ptr != NULL)
         {
                 sArr[i] = ptr;
@@ -75,11 +86,13 @@ int check_disk()
                 ptr = strtok(NULL, " ");
         }
 
+	a_size = atoi(ptr2);
         byte = atoi(sArr[0]);
-        printf("current size = %d\n", byte);
+        printf("current size = %dkb , available size = %dkb\n", byte , a_size);
 
         return byte;
 }
+
 void getfiletime(time_t org_time, char *time_str)
 {
     struct tm *tm_ptr;
@@ -108,6 +121,7 @@ void getdirtime(time_t org_time, char *time_str)
 int main(int argc, char* argv[])
 {
 	Mat img_color;
+	pid_t ppid;
 	time_t the_time;
 	char v_buffer[100];
 	char d_buffer[100];
@@ -116,6 +130,7 @@ int main(int argc, char* argv[])
 	int s_time;
 	bool first=true;
 
+	ppid = getppid();
 	// for jetson onboard camera
 	string gst = "nvarguscamerasrc ! video/x-raw(memory:NVMM), width=(int)500, height=(int)300,format=(string)NV12, framerate=(fraction)24/1 ! nvvidconv flip-method=0 ! video/x-raw, format=(string)BGRx ! videoconvert ! video/x-raw, format=(string)BGR ! appsink";
 	
@@ -170,6 +185,7 @@ int main(int argc, char* argv[])
 			videoName += ".avi";
 			
 			video.open(videoName,CV_FOURCC('D','I','V','X'),24,Size(500,300));
+			kill(ppid,SIGUSR1);
 			first = false;
 		}
 

@@ -18,7 +18,7 @@ struct timeval UTCtime_s, UTCtime_e, UTCtime_r;
 int sec;
 int first = 0;
 
-void disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
+long disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 {
 	struct timeval UTCtime_r;
 	if((UTCtime_e.tv_usec- UTCtime_s.tv_usec)<0)
@@ -31,7 +31,8 @@ void disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 		UTCtime_r.tv_sec = UTCtime_e.tv_sec - UTCtime_s.tv_sec;
 		UTCtime_r.tv_usec = UTCtime_e.tv_usec - UTCtime_s.tv_usec;
 	}
-	printf("runtime : %ld sec %ld\n", UTCtime_r.tv_sec, UTCtime_r.tv_usec);
+	printf("runtime : %ld \n", UTCtime_r.tv_sec);
+	return UTCtime_r.tv_sec;
 }
 
 void sigHandler(int sig)
@@ -40,14 +41,18 @@ void sigHandler(int sig)
 	{
 		gettimeofday(&UTCtime_e,NULL);
 		printf("Black box is still alive!\n ");
-		disp_runtime(UTCtime_s,UTCtime_e);
+		long sec = disp_runtime(UTCtime_s,UTCtime_e);
+		if(sec > 35)
+		{
+			printf("error !! over 35 sec !!\n");
+			exit(0);
+		}
 	}
 	else
 	{
 		printf("Black box recording start!\n");
 		first = 1;
 	}	
-	
 	gettimeofday(&UTCtime_s,NULL);
 }
 
@@ -72,6 +77,6 @@ void main()
 					 break;
 	}
 	pid = wait(&status);
-	printf("exited pid = %d\n",pid);
+	printf(" exit pid = %d\n",pid);
 }
 

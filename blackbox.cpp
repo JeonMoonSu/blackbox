@@ -169,12 +169,11 @@ int main(int argc, char* argv[])
 			videoName += v_buffer;
 			videoName += ".avi";
 			
-			video.open(videoName,CV_FOURCC('D','I','V','X'),12,Size(500,300));
+			video.open(videoName,CV_FOURCC('D','I','V','X'),24,Size(500,300));
 			first = false;
 		}
 
 		//read,write
-		cap.read(img_color);
 		video.write(img_color);
 		imshow("Color", img_color);
 

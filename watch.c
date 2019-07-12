@@ -56,7 +56,7 @@ void sigHandler(int sig)
 	gettimeofday(&UTCtime_s,NULL);
 }
 
-void main()
+void main(int argc, char* argv[])
 {
 	pid_t pid;
 
@@ -73,10 +73,10 @@ void main()
 		case 	 0 : ret = execlp("./blackbox","blackbox",NULL);
 					 fprintf(stderr,"execlp error:%s\n",strerror(errno));
 					 exit(0);
-		default : 	
+		default : 
 					 break;
 	}
 	pid = wait(&status);
-	printf(" exit pid = %d\n",pid);
+	printf("[exit pid] = %d\n",pid);
 }
 

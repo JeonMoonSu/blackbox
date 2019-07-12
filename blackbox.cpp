@@ -8,9 +8,10 @@
 #include <sys/types.h>
 #include <stdlib.h>
 
-
+#define vr_time 30 //video recording time
 using namespace cv;
 using namespace std;
+
 
 char* command_call(char* path)
 {
@@ -159,12 +160,10 @@ int main(int argc, char* argv[])
 		time(&the_time);
 		getdirtime(the_time,d_buffer);
 		//record starting first = check start time, make new directory
-		if(first)
-		{
 			s_time = the_time;
 			folderName = d_buffer;
 			makeDir(folderName);
-		}
+	
 		//hour divided folder,make new folder
 		if(folderName != d_buffer)
 		{
@@ -172,7 +171,7 @@ int main(int argc, char* argv[])
 			makeDir(folderName);
 		}
 		//make new record file 
-		if(the_time >= s_time+30 || first) //first or after 10seconds
+		if(the_time >= s_time+vr_time || first) //first or after 10seconds
 		{
 			if(check_disk() > 8300000)
 			{

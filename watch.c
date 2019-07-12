@@ -14,9 +14,9 @@
 #include<wait.h>
 #include<sys/time.h>
 
+#define vr_time 30 // video runtime
 struct timeval UTCtime_s, UTCtime_e, UTCtime_r;
 int sec;
-int first = 0;
 
 long disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 {
@@ -37,23 +37,31 @@ long disp_runtime(struct timeval UTCtime_s, struct timeval UTCtime_e)
 
 void sigHandler(int sig)
 {
-	if(first)
+	swtich(sig)
 	{
-		gettimeofday(&UTCtime_e,NULL);
-		printf("Black box is still alive!\n ");
-		long sec = disp_runtime(UTCtime_s,UTCtime_e);
-		if(sec > 35)
-		{
-			printf("error !! over 35 sec !!\n");
-			exit(0);
-		}
+		case SIGINT:
+					exit(0);
+					break;
+
+		case SIGUSR1:
+					gettimeofday(&UTCtime_e,NULL);
+					if(UTCtime_s.tv_sec != 0)
+					{
+						long sec = disp_runtime(UTCtime_s,UTCtime_e);
+						if(sec > vr_time+2)
+						{
+							printf("error !! over 35 sec !!\n");
+							exit(0);
+						}
+					}
+					else
+						printf("black box starting!\n");
+					gettimeofday(&UTCtime_s,NULL);
+
+					break;
+		default:
+					printf("sig number: %d\n",sig);
 	}
-	else
-	{
-		printf("Black box recording start!\n");
-		first = 1;
-	}	
-	gettimeofday(&UTCtime_s,NULL);
 }
 
 void main(int argc, char* argv[])
@@ -64,9 +72,10 @@ void main(int argc, char* argv[])
 	int ret;
 
 	signal(SIGUSR1,sigHandler);
+	signal(SIGINT,sigHandler);
 
 	pid = fork();
-
+	printf("pid = %d",pid);
 	switch(pid)
 	{
 		case	-1 : perror("fork failed"); exit(0);

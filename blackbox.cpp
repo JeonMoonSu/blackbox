@@ -1,4 +1,3 @@
-#pragma once
 #include <time.h>
 #include <signal.h>
 #include <unistd.h>
@@ -118,6 +117,12 @@ void getdirtime(time_t org_time, char *time_str)
                     tm_ptr->tm_hour
                     );
 }
+void makeDir(string folderName);
+{
+	string str = "mkdir ./user/blackbox/"+folderName;
+	const char* command = str.c_str();
+	system(command);
+}
 int main(int argc, char* argv[])
 {
 	Mat img_color;
@@ -139,7 +144,7 @@ int main(int argc, char* argv[])
 	//video open failed
 	if(!cap.isOpened())
 	{
-		cout << "errororor" <<endl;
+		cout << "camera open error!\n" <<endl;
 		return 1;
 	}
 	
@@ -158,22 +163,18 @@ int main(int argc, char* argv[])
 		{
 			s_time = the_time;
 			folderName = d_buffer;
-			string str = "mkdir ./user/blackbox/"+folderName;
-			const char* command = str.c_str();
-			system(command);
+			makeDir(folderName);
 		}
 		//hour divided folder,make new folder
 		if(folderName != d_buffer)
 		{
 			folderName = d_buffer;
-			string str = "mkdir ./user/blackbox/"+folderName;
-			const char* command = str.c_str();
-			system(command);
+			makeDir(folderName);
 		}
 		//make new record file 
 		if(the_time >= s_time+30 || first) //first or after 10seconds
 		{
-			if(check_disk() > 9300000)
+			if(check_disk() > 8300000)
 			{
 				printf("buffer over\n");
 				remove_dir();
@@ -189,7 +190,7 @@ int main(int argc, char* argv[])
 			first = false;
 		}
 
-		//read,write
+		//write and show 
 		video.write(img_color);
 		imshow("Color", img_color);
 
